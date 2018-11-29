@@ -2,16 +2,15 @@ import java.util.Random;
 
 class Qlearning
 {
-	private double ε = 0.05;
-	private double gamma = 0.97;
+	private double ε;
+	private double gamma;
 	private double learningRate;
 	private double[][][] Q = new double[20][10][4];
 	private int x;
 	private int y;
-	private int outOfBoundsX = 20;
-	private int outOfBoundsY = 10;
-	private int action;
-	private double reward;
+	private int outOfBoundsX;
+	private int outOfBoundsY;
+	static private Random rand;
 	private double[][] board = {
 			{0, 0, 0, 0, 0, - 25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
 			{0, 0, 0, 0, 0, - 25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -30,6 +29,10 @@ class Qlearning
 		this.ε = 0.05;
 		this.gamma = 0.97;
 		this.learningRate = 0.1;
+		reset();
+		this.outOfBoundsX = 20;
+		this.outOfBoundsY = 10;
+		rand = new Random();
 	}
 
 	private void reset()
@@ -39,9 +42,9 @@ class Qlearning
 
 	}
 
-	private void QLearner(int numberOfGames)
+	private void QLearner(int numberOfIterations)
 	{
-		for (int k = 0; k < 1000000; k++)
+		for (int k = 0; k < numberOfIterations; k++)
 		{
 			// Pick an action
 			int currentStateX;
@@ -49,7 +52,6 @@ class Qlearning
 			currentStateX = x;
 			currentStateY = y;
 			int action = 0;
-			Random rand = new Random();
 			if (rand.nextDouble() < ε)
 			{
 				// Explore (pick a random action)
@@ -72,10 +74,12 @@ class Qlearning
 			int nextY = y;
 
 
-			Q[x][y][action] = (1 - learningRate) * Q[x][y][action] + learningRate * (board[nextX][nextY] + gamma * getMaxQValue(nextX, nextY));
-
+			Q[currentStateX][currentStateY][action] = (1 - learningRate) * Q[currentStateX][currentStateY][action] + learningRate * (board[nextX][nextY] + gamma * getMaxQValue(nextX, nextY));
+			if (board[nextX][nextY] == 100)
+			{
+				reset();
+			}
 		}
-
 	}
 
 	private double getMaxQValue(int nextX, int nextY)
@@ -140,6 +144,7 @@ class Qlearning
 
 	public static void main(String[] args)
 	{
+		Qlearning learn = new Qlearning();
 
 	}
 

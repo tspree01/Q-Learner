@@ -10,21 +10,24 @@ class Qlearning
 	private int y;
 	private int outOfBoundsX;
 	private int outOfBoundsY;
+	int currentStateX;
+	int currentStateY;
+	private String action;
 	static private Random rand;
 	private double[][] board = {
-			{0, 0, 0, 0, 0, - 25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-			{0, 0, 0, 0, 0, - 25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-			{0, 0, 0, 0, 0, - 25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-			{0, 0, 0, 0, 0, - 25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, - 3, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, - 3, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, - 3, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, - 3, 0, 0, 0, 0, 0, 0, 0, 0, 0},
 			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
 			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-			{0, 0, 0, 0, 0, - 25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-			{0, 0, 0, 0, 0, - 25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-			{0, 0, 0, 0, 0, - 25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-			{0, 0, 0, 0, 0, - 25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100},
+			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, - 3, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, - 3, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, - 3, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, - 3, 0, 0, 0, 0, 0, 0, 0, 0, 10},
 	};
 
-	public Qlearning()
+	private Qlearning()
 	{
 		this.ε = 0.05;
 		this.gamma = 0.97;
@@ -47,8 +50,6 @@ class Qlearning
 		for (int k = 0; k < numberOfIterations; k++)
 		{
 			// Pick an action
-			int currentStateX;
-			int currentStateY;
 			currentStateX = x;
 			currentStateY = y;
 			int action = 0;
@@ -60,7 +61,7 @@ class Qlearning
 			else
 			{
 				// Exploit (pick the best action)
-				action = 0;
+
 				for (int candidate = 0; candidate < 4; candidate++)
 				{
 					if (Q[x][y][candidate] > Q[x][y][action])
@@ -74,78 +75,139 @@ class Qlearning
 			int nextY = y;
 
 
-			Q[currentStateX][currentStateY][action] = (1 - learningRate) * Q[currentStateX][currentStateY][action] + learningRate * (board[nextX][nextY] + gamma * getMaxQValue(nextX, nextY));
-			if (board[nextX][nextY] == 100)
+			Q[currentStateX][currentStateY][action] = (1 - learningRate) * Q[currentStateX][currentStateY][action] + learningRate * (board[nextY][nextX] + gamma * getMaxQValueForJ(nextX, nextY));
+			if (board[currentStateY][currentStateX] == 10)
 			{
 				reset();
 			}
+
+			if (k * 10 % 10000 == 0)
+			{
+
+				for (int i = 0; i < board.length; i++)
+				{
+					for (int j = 0; j < 20; j++)
+					{
+						if (board[i][j] == 0)
+						{
+							int actions = getMaxQValue(j, i);
+							if (actions == 0)
+							{
+								System.out.print("<");
+							}
+							else if (actions == 1)
+							{
+								System.out.print(">");
+							}
+							else if (actions == 2)
+							{
+								System.out.print("v");
+							}
+							else if (actions == 3)
+							{
+								System.out.print("^");
+							}
+						}
+						else if (board[i][j] == - 3)
+						{
+							System.out.print("#");
+						}
+						else if (board[i][j] == 10)
+						{
+							System.out.print("G");
+						}
+					}
+					System.out.println();
+				}
+				System.out.println();
+			}
+
 		}
 	}
 
-	private double getMaxQValue(int nextX, int nextY)
+	private double getMaxQValueForJ(int nextX, int nextY)
 	{
-		double maxQValue = 0;
+		double maxQValue = Q[nextX][nextY][0];
 		int action = 0;
-		for (int candidate = 0; candidate < 4; candidate++)
+		int actions = 0;
+		for (int candidate = 1; candidate < 4; candidate++)
 		{
 
-			if (Q[x][y][candidate] > Q[x][y][action])
-			{ maxQValue = Q[x][y][candidate]; }
+			if (Q[nextX][nextY][candidate] > maxQValue)
+			{
+				maxQValue = Q[nextX][nextY][candidate];
+			}
 		}
 		return maxQValue;
+	}
+
+	private int getMaxQValue(int nextX, int nextY)
+	{
+		double maxQValue = Q[nextX][nextY][0];
+		int action = 0;
+		int actions = 0;
+		for (int candidate = 1; candidate < 4; candidate++)
+		{
+
+			if (Q[nextX][nextY][candidate] > maxQValue)
+			{
+				maxQValue = Q[nextX][nextY][candidate];
+				actions = candidate;
+
+			}
+		}
+		return actions;
 	}
 
 	private void doAction(int action)
 	{
 		// go left
-		if (action == 1)
+		if (action == 0)
 		{
-			if (! isOutOfBounds(x, y))
+			if (x - 1 > 0 && x - 1 < outOfBoundsX)
 			{
 				x--;
 			}
 		}
 		//go right
-		else if (action == 2)
+		else if (action == 1)
 		{
-			if (! isOutOfBounds(x, y))
+			if (x + 1 >= 0 && x + 1 < outOfBoundsX)
 			{
 				x++;
+			}
+		}
+		// go up
+		else if (action == 2)
+		{
+			if (y + 1 >= 0 && y + 1 < outOfBoundsY)
+			{
+				y++;
 			}
 		}
 		// go down
 		else if (action == 3)
 		{
-			if (! isOutOfBounds(x, y))
+			if (y - 1 >= 0 && y - 1 < outOfBoundsY)
 			{
 				y--;
 			}
 		}
-		// go up
-		else if (action == 4)
-		{
-			if (! isOutOfBounds(x, y))
-			{
-				y++;
-			}
-		}
+
 	}
 
 
 	private boolean isOutOfBounds(int x, int y)
 	{
 		//check to see if the agent is out of bounds and if it hit a wall
-		if (x < outOfBoundsX && x >= 0 && y < outOfBoundsY && y >= 0)
-		{
-			return false;
-		}
-		return board[x][y] == - 25;
+		return board[y][x] == - 25;
 	}
 
 	public static void main(String[] args)
 	{
 		Qlearning learn = new Qlearning();
-
+		learn.QLearner(10000000);
+		System.out.println();
 	}
 
 }

@@ -83,7 +83,7 @@ class Qlearning
 
 			if (k * 10 % 10000 == 0)
 			{
-
+				System.out.print("S");
 				for (int i = 0; i < board.length; i++)
 				{
 					for (int j = 0; j < 20; j++)
@@ -93,28 +93,28 @@ class Qlearning
 							int actions = getMaxQValue(j, i);
 							if (actions == 0)
 							{
-								System.out.print("<");
+								System.out.print(" < ");
 							}
 							else if (actions == 1)
 							{
-								System.out.print(">");
+								System.out.print(" > ");
 							}
 							else if (actions == 2)
 							{
-								System.out.print("v");
+								System.out.print(" v ");
 							}
 							else if (actions == 3)
 							{
-								System.out.print("^");
+								System.out.print(" ^ ");
 							}
 						}
 						else if (board[i][j] == - 3)
 						{
-							System.out.print("#");
+							System.out.print(" # ");
 						}
 						else if (board[i][j] == 10)
 						{
-							System.out.print("G");
+							System.out.print(" G ");
 						}
 					}
 					System.out.println();
